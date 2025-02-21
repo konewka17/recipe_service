@@ -2,7 +2,6 @@ import yaml
 import os
 import logging
 from homeassistant.core import HomeAssistant, ServiceCall
-from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,14 +21,14 @@ def update_recipe(hass: HomeAssistant, call: ServiceCall):
     """Update a recipe in recipes.yaml."""
     file_path = hass.config.path("www/recipes.yaml")
 
-    recipe_id = call.data.get("recipe_id")
+    recipe_name = call.data.get("recipe_name")
     new_yaml = call.data.get("new_yaml")
 
-    if not recipe_id or not new_yaml:
-        _LOGGER.error("Missing required parameters: recipe_id or new_yaml")
+    if not recipe_name or not new_yaml:
+        _LOGGER.error("Missing required parameters: recipe_name or new_yaml")
         return
 
-    _LOGGER.info(f"Updating recipe {recipe_id} in {file_path}")
+    _LOGGER.info(f"Updating recipe {recipe_name} in {file_path}")
 
     # Load existing recipes
     data = load_yaml(file_path)
@@ -38,7 +37,7 @@ def update_recipe(hass: HomeAssistant, call: ServiceCall):
     # Find and update the recipe
     updated = False
     for recipe in recipes:
-        if recipe.get("id") == recipe_id:
+        if recipe.get("name") == recipe_name:
             try:
                 updated_data = yaml.safe_load(new_yaml)  # Validate YAML structure
                 recipe.update(updated_data)
@@ -48,9 +47,15 @@ def update_recipe(hass: HomeAssistant, call: ServiceCall):
                 return
 
     if not updated:
-        _LOGGER.warning(f"Recipe with ID {recipe_id} not found.")
-        return
+        _LOGGER.info(f"Recipe with ID {recipe_name} not found. Adding as a new recipe.")
+        try:
+            new_recipe = yaml.safe_load(new_yaml)
+            new_recipe["id"] = recipe_name  # Ensure the new recipe has an ID
+            recipes.append(new_recipe)
+        except yaml.YAMLError as e:
+            _LOGGER.error(f"Invalid YAML format: {e}")
+            return
 
     # Save back to YAML
     save_yaml(file_path, {"recipes": recipes})
-    _LOGGER.info(f"Recipe {recipe_id} updated successfully.")
+    _LOGGER.info(f"Recipe {recipe_name} updated successfully.")
