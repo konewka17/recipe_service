@@ -1,6 +1,6 @@
 {
   "name": "Recipe Editor",
-  "domain": "recipe_service",
+  "domain": "recipes",
   "documentation": "https://github.com/konewka/ha-recipes",
   "source": "https://github.com/konewka/ha-recipes",
   "codeowners": ["@konewka"],

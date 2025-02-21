@@ -1,2 +1,2 @@
-DOMAIN = "recipe_service"
+DOMAIN = "recipes"
 SERVICE_UPDATE_RECIPE = "update_recipe"
