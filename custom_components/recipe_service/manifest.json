@@ -1,5 +1,5 @@
 {
-  "domain": "recipes",
+  "domain": "recipe_service",
   "name": "Recipe Editor",
   "version": "1.0.0",
   "documentation": "https://github.com/yourusername/ha-recipes",
