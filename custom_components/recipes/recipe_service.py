@@ -1,22 +1,22 @@
+from ruamel.yaml import YAML
 import yaml
-import ruamel.yaml
 import os
 import logging
 from homeassistant.core import HomeAssistant, ServiceCall
 
 _LOGGER = logging.getLogger(__name__)
 
-def load_yaml(file_path):
+def load_yaml(file_path, yaml_object):
     """Load YAML file safely."""
     if not os.path.exists(file_path):
         return []
     with open(file_path, "r", encoding="utf-8") as file:
-        return ruamel.yaml.round_trip_load(file) or []
+        return yaml_object.load(file) or []
 
-def save_yaml(file_path, data):
+def save_yaml(file_path, data, yaml_object):
     """Save YAML file safely."""
     with open(file_path, "w", encoding="utf-8") as file:
-        ruamel.yaml.round_trip_dump(data, file)
+        yaml_object.dump(data, file)
 
 def update_recipe(hass: HomeAssistant, call: ServiceCall):
     """Update a recipe in recipes.yaml."""
@@ -32,7 +32,8 @@ def update_recipe(hass: HomeAssistant, call: ServiceCall):
     _LOGGER.info(f"Updating recipe {recipe_name} in {file_path}")
 
     # Load existing recipes
-    recipes = load_yaml(file_path)
+    yaml_object = YAML()
+    recipes = load_yaml(file_path, yaml_object)
 
     # Find and update the recipe
     updated = False
@@ -57,5 +58,5 @@ def update_recipe(hass: HomeAssistant, call: ServiceCall):
             return
 
     # Save back to YAML
-    save_yaml(file_path, recipes)
+    save_yaml(file_path, recipes, yaml_object)
     _LOGGER.info(f"Recipe {recipe_name} updated successfully.")
