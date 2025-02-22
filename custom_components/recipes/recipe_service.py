@@ -31,8 +31,7 @@ def update_recipe(hass: HomeAssistant, call: ServiceCall):
     _LOGGER.info(f"Updating recipe {recipe_name} in {file_path}")
 
     # Load existing recipes
-    data = load_yaml(file_path)
-    recipes = data.get("recipes", [])
+    recipes = load_yaml(file_path)
 
     # Find and update the recipe
     updated = False
