@@ -33,6 +33,7 @@ def update_recipe(hass: HomeAssistant, call: ServiceCall):
 
     # Load existing recipes
     yaml_object = YAML()
+    yaml_object.indent(mapping=2, sequence=4, offset=2)
     recipes = load_yaml(file_path, yaml_object)
 
     # Find and update the recipe
