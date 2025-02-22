@@ -8,14 +8,14 @@ _LOGGER = logging.getLogger(__name__)
 def load_yaml(file_path):
     """Load YAML file safely."""
     if not os.path.exists(file_path):
-        return {"recipes": []}  # Ensure a valid format if file doesn't exist
+        return []
     with open(file_path, "r", encoding="utf-8") as file:
-        return yaml.safe_load(file) or {"recipes": []}
+        return yaml.safe_load(file) or []
 
 def save_yaml(file_path, data):
     """Save YAML file safely."""
     with open(file_path, "w", encoding="utf-8") as file:
-        yaml.safe_dump(data, file, default_flow_style=False, allow_unicode=True)
+        yaml.safe_dump(data, file, default_flow_style=False, allow_unicode=True, sort_keys=False)
 
 def update_recipe(hass: HomeAssistant, call: ServiceCall):
     """Update a recipe in recipes.yaml."""
@@ -56,5 +56,5 @@ def update_recipe(hass: HomeAssistant, call: ServiceCall):
             return
 
     # Save back to YAML
-    save_yaml(file_path, {"recipes": recipes})
+    save_yaml(file_path, recipes)
     _LOGGER.info(f"Recipe {recipe_name} updated successfully.")
