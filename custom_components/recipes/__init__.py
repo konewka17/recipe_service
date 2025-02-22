@@ -8,6 +8,6 @@ _LOGGER = logging.getLogger(__name__)
 
 def setup(hass: HomeAssistant, config: dict):
     """Set up the custom component."""
-    hass.services.register(DOMAIN, SERVICE_UPDATE_RECIPE, update_recipe)
+    hass.services.register(DOMAIN, SERVICE_UPDATE_RECIPE, lambda x: update_recipe(hass, x))
     _LOGGER.info("Recipes custom component loaded.")
     return True
