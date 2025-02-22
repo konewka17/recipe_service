@@ -1,4 +1,5 @@
 import yaml
+import ruamel.yaml
 import os
 import logging
 from homeassistant.core import HomeAssistant, ServiceCall
@@ -10,12 +11,12 @@ def load_yaml(file_path):
     if not os.path.exists(file_path):
         return []
     with open(file_path, "r", encoding="utf-8") as file:
-        return yaml.safe_load(file) or []
+        return ruamel.yaml.round_trip_load(file) or []
 
 def save_yaml(file_path, data):
     """Save YAML file safely."""
     with open(file_path, "w", encoding="utf-8") as file:
-        yaml.safe_dump(data, file, default_flow_style=False, allow_unicode=True, sort_keys=False)
+        ruamel.yaml.round_trip_dump(data, file)
 
 def update_recipe(hass: HomeAssistant, call: ServiceCall):
     """Update a recipe in recipes.yaml."""
