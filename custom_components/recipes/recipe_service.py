@@ -1,5 +1,4 @@
 from ruamel.yaml import YAML
-import yaml
 import os
 import logging
 
@@ -26,32 +25,25 @@ def _update_recipe_sync(file_path, recipe_name, new_yaml):
     yaml_object.indent(mapping=2, sequence=4, offset=2)
     yaml_object.width = 4096
 
-    # Load existing recipes
     recipes = load_yaml(file_path, yaml_object)
 
-    # Find and update the recipe
+    try:
+        new_recipe = YAML(typ="safe").load(new_yaml)
+    except Exception as e:
+        _LOGGER.error(f"Invalid YAML format: {e}")
+        return False
+
     updated = False
     for recipe in recipes:
         if recipe.get("name") == recipe_name:
-            try:
-                updated_data = yaml.safe_load(new_yaml)  # Validate YAML structure
-                recipe.update(updated_data)
-                updated = True
-            except yaml.YAMLError as e:
-                _LOGGER.error(f"Invalid YAML format: {e}")
-                return False
+            recipe.update(new_recipe)
+            updated = True
+            break
 
     if not updated:
         _LOGGER.info(f"Recipe {recipe_name} not found. Adding as a new recipe.")
-        try:
-            new_recipe = yaml.safe_load(new_yaml)
-            new_recipe["id"] = recipe_name  # Ensure the new recipe has an ID
-            recipes.append(new_recipe)
-        except yaml.YAMLError as e:
-            _LOGGER.error(f"Invalid YAML format: {e}")
-            return False
+        recipes.append(new_recipe)
 
-    # Save back to YAML
     save_yaml(file_path, recipes, yaml_object)
     _LOGGER.info(f"Recipe {recipe_name} updated successfully.")
     return True
