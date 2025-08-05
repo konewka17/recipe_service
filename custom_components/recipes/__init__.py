@@ -2,8 +2,8 @@
 import logging
 from homeassistant.core import HomeAssistant, ServiceCall
 
-from .const import DOMAIN, SERVICE_UPDATE_RECIPE
-from .recipe_service import _update_recipe_sync
+from .const import DOMAIN, SERVICE_UPDATE_RECIPE, SERVICE_CREATE_RECIPE
+from .recipe_service import _update_recipe_sync, _create_recipe_sync
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,6 +29,24 @@ async def async_setup(hass: HomeAssistant, config: dict):
         if not success:
             _LOGGER.error(f"Failed to update recipe {recipe_name}")
 
+    async def create_recipe(call: ServiceCall):
+        """Asynchronously create a new recipe in recipes.yaml."""
+        file_path = hass.config.path("www/recipes.yaml")
+        recipe_name = call.data.get("recipe_name")
+
+        if not recipe_name:
+            _LOGGER.error("Missing required parameter: recipe_name")
+            return
+
+        _LOGGER.info(f"Creating new recipe {recipe_name} in {file_path}")
+
+        # Run the file creation in a separate thread to prevent blocking the event loop
+        success = await hass.async_add_executor_job(_create_recipe_sync, file_path, recipe_name)
+
+        if not success:
+            _LOGGER.error(f"Failed to create recipe {recipe_name}")
+
     hass.services.async_register(DOMAIN, SERVICE_UPDATE_RECIPE, update_recipe)
+    hass.services.async_register(DOMAIN, SERVICE_CREATE_RECIPE, create_recipe)
     _LOGGER.info("Recipe Editor integration loaded successfully")
     return True

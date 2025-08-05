@@ -1,0 +1,40 @@
+update_recipe:
+  name: Update Recipe
+  description: Update an existing recipe or create a new one with the provided YAML data.
+  fields:
+    recipe_name:
+      name: Recipe Name
+      description: The name of the recipe to update or create
+      required: true
+      example: "Pasta Carbonara"
+      selector:
+        text:
+    new_yaml:
+      name: New YAML
+      description: The new recipe data in YAML format
+      required: true
+      example: |
+        name: "Pasta Carbonara"
+        persons: 4
+        category: "Pasta"
+        ingredients:
+          - "400g spaghetti"
+          - "200g pancetta"
+        instructions:
+          - "Cook pasta according to package"
+          - "Fry pancetta until crispy"
+      selector:
+        text:
+          multiline: true
+
+create_recipe:
+  name: Create Recipe
+  description: Create a new recipe with minimal structure. Will fail if recipe name already exists.
+  fields:
+    recipe_name:
+      name: Recipe Name
+      description: The name of the new recipe to create
+      required: true
+      example: "My New Recipe"
+      selector:
+        text:

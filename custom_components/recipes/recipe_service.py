@@ -19,12 +19,17 @@ def save_yaml(file_path, data, yaml_object):
         yaml_object.dump(data, file)
 
 
-def _update_recipe_sync(file_path, recipe_name, new_yaml):
-    """Synchronous function for updating a recipe in YAML."""
+def get_yaml_object():
+    """Load recipes.yaml file safely."""
     yaml_object = YAML()
     yaml_object.indent(mapping=2, sequence=4, offset=2)
     yaml_object.width = 4096
+    return yaml_object
 
+
+def _update_recipe_sync(file_path, recipe_name, new_yaml):
+    """Synchronous function for updating a recipe in YAML."""
+    yaml_object = get_yaml_object()
     recipes = load_yaml(file_path, yaml_object)
 
     try:
@@ -46,4 +51,30 @@ def _update_recipe_sync(file_path, recipe_name, new_yaml):
 
     save_yaml(file_path, recipes, yaml_object)
     _LOGGER.info(f"Recipe {recipe_name} updated successfully.")
+    return True
+
+
+def _create_recipe_sync(file_path, recipe_name):
+    """Synchronous function for creating a new recipe in YAML."""
+    yaml_object = get_yaml_object()
+    recipes = load_yaml(file_path, yaml_object)
+
+    # Check if recipe name already exists
+    for recipe in recipes:
+        if recipe.get("name") == recipe_name:
+            _LOGGER.error(f"Recipe with name {recipe_name} already exists")
+            return False
+
+    # Create new recipe with minimal structure
+    new_recipe = {
+        "name": recipe_name,
+        "persons": 2,
+        "category": "",
+        "ingredients": ["ingredient"],
+        "instructions": ["instruction"]
+    }
+
+    recipes.append(new_recipe)
+    save_yaml(file_path, recipes, yaml_object)
+    _LOGGER.info(f"Recipe {recipe_name} created successfully")
     return True
