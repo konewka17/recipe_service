@@ -27,16 +27,22 @@ def get_yaml_object():
     return yaml_object
 
 
-def _update_recipe_sync(file_path, recipe_name, new_yaml):
+def _update_recipe_sync(file_path, recipe_name, new_yaml, printed=None):
     """Synchronous function for updating a recipe in YAML."""
     yaml_object = get_yaml_object()
     recipes = load_yaml(file_path, yaml_object)
 
-    try:
-        new_recipe = YAML(typ="safe").load(new_yaml)
-    except Exception as e:
-        _LOGGER.error(f"Invalid YAML format: {e}")
-        return False
+    if new_yaml:
+        try:
+            new_recipe = YAML(typ="safe").load(new_yaml)
+        except Exception as e:
+            _LOGGER.error(f"Invalid YAML format: {e}")
+            return False
+    else:
+        new_recipe = {}
+
+    if printed is not None:
+        new_recipe["printed"] = printed
 
     updated = False
     for recipe in recipes:
@@ -70,6 +76,7 @@ def _create_recipe_sync(file_path, recipe_name):
         "name": recipe_name,
         "persons": 2,
         "category": "",
+        "printed": False,
         "ingredients": ["ingredient"],
         "instructions": ["instruction"]
     }
