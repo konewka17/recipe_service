@@ -18,7 +18,7 @@ async def async_setup(hass: HomeAssistant, config: dict):
         new_yaml = call.data.get("new_yaml")
         printed = call.data.get("printed")
 
-        if not recipe_name or (not new_yaml and not printed):
+        if recipe_name is None or (new_yaml is None and printed is None):
             _LOGGER.error("Missing required parameters: recipe_name or new_yaml / printed")
             return
 
