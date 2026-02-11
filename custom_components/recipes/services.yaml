@@ -12,7 +12,7 @@ update_recipe:
     new_yaml:
       name: New YAML
       description: The new recipe data in YAML format
-      required: true
+      required: false
       example: |
         name: "Pasta Carbonara"
         persons: 4
@@ -26,6 +26,11 @@ update_recipe:
       selector:
         text:
           multiline: true
+    update_printed:
+      name: Update printed
+      description: Update "printed" parameter to false when updating
+      required: false
+      default: true
 
 create_recipe:
   name: Create Recipe

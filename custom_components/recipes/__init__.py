@@ -16,15 +16,16 @@ async def async_setup(hass: HomeAssistant, config: dict):
         file_path = hass.config.path("www/recipes.yaml")
         recipe_name = call.data.get("recipe_name")
         new_yaml = call.data.get("new_yaml")
+        update_printed = call.data.get("update_printed", True)
 
-        if not recipe_name or not new_yaml:
+        if not recipe_name or (not new_yaml and not update_printed):
             _LOGGER.error("Missing required parameters: recipe_name or new_yaml")
             return
 
         _LOGGER.info(f"Updating recipe {recipe_name} in {file_path}")
 
         # Run the file update in a separate thread to prevent blocking the event loop
-        success = await hass.async_add_executor_job(_update_recipe_sync, file_path, recipe_name, new_yaml)
+        success = await hass.async_add_executor_job(_update_recipe_sync, file_path, recipe_name, new_yaml, update_printed)
 
         if not success:
             _LOGGER.error(f"Failed to update recipe {recipe_name}")
